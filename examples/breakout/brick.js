@@ -1,8 +1,9 @@
 'use strict'
 
 class Brick extends Rectangle {
-    constructor(x, y, width, height, strength=2) {
+    constructor(x, y, width, height, color, strength=1) {
         super(x, y, width, height)
+        this.color = color
 
         this.maxStrength = strength
         this.strength = strength
@@ -21,7 +22,7 @@ class Brick extends Rectangle {
     draw(g, showEdges=false) {
         if (this.strength > 0) {
             let fillAlpha = this.strength / this.maxStrength
-            super.draw(g, 1, 'rgba(255, 0, 255, 1.0)', `rgba(255, 0, 255, ${fillAlpha})`)
+            super.draw(g, 1, this.color, this.color)
             if(showEdges) {
                 if(this.top.show) {
                     this.top.draw(g, 2, '#00f')
@@ -76,18 +77,28 @@ class Brick extends Rectangle {
 
 
 class Bricks {
-    constructor(rows=5, cols=9, width=60, height=30, padding=5, offsetTop=120, offsetLeft=30) {
-        let strength = 2
+    constructor(rows=6, cols=9, width=60, height=30, padding=5, offsetTop=120, offsetLeft=30) {
+        this.brickTypes = [
+            {color: '#808080', strength: 5},
+            {color: '#ff0000', strength: 1},
+            {color: '#ffff00', strength: 1},
+            {color: '#0000ff', strength: 1},
+            {color: '#ff00ff', strength: 1},
+            {color: '#00ff00', strength: 1},
+        ]
+
         this.rows = rows
         this.cols = cols
         this.remaining = this.rows * this.cols
         this.bricks = []
+
         for (let i=0; i < this.cols; i++) {
             this.bricks[i] = []
             for (let j=0; j < this.rows; j++) {
+                let brickType = this.brickTypes[j]
                 let x = (i * (width + padding)) + offsetLeft
                 let y = (j * (height + padding)) + offsetTop
-                this.bricks[i][j] = new Brick(x, y, width, height, strength)
+                this.bricks[i][j] = new Brick(x, y, width, height, brickType.color, brickType.strength)
             }
         }
     }
