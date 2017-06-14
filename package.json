@@ -1,0 +1,21 @@
+{
+  "name": "yutani.git",
+  "version": "1.0.0",
+  "description": "Building Better Worlds™",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drkjam/yutani.git"
+  },
+  "author": "David Moss",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/drkjam/yutani/issues"
+  },
+  "homepage": "https://github.com/drkjam/yutani#readme",
+  "devDependencies": {
+  }
+}
