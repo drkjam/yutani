@@ -90,6 +90,7 @@ class Breakout extends Engine {
     }
 
     registerEvents() {
+        this.canvas.style.cursor = 'none'
         document.addEventListener('mousemove', (e) => {
             e.preventDefault()
             let relativeX = e.clientX - this.canvas.offsetLeft
@@ -160,7 +161,6 @@ class Breakout extends Engine {
 
         if(this.debug) {
             //  Draw velocity vector for the ball.
-            // let v = this.ball.vector.scale(this.ball.radius / 2)
             let v = this.ball.vector
             let s = new Segment(this.ball.x, this.ball.y, this.ball.x + v.x, this.ball.y + v.y)
             let p = new Point(this.ball.x + v.x, this.ball.y + v.y)
@@ -264,10 +264,6 @@ class Breakout extends Engine {
             }
 
             //  Move objects to their next position.
-
-            //  Move movement is a bit buggy (paddle gets stuck).
-            // this.paddle.moveX(this.mouse.x)
-
             if(this.moveLeft) {
                 this.paddle.moveLeft()
             }

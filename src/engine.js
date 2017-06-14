@@ -8,13 +8,6 @@ class Engine {
         this.width = canvas.width
         this.height = canvas.height
         this.g = canvas.getContext('2d')
-
-        if(enableMouse) {
-            this.mouse = new Mouse(canvas.offsetLeft, canvas.offsetTop, this.width, this.height)
-            this.mouse.registerEvents(window, canvas)
-        } else {
-            console.log('mouse controls disabled')
-        }
         this.frameId = null
     }
 
