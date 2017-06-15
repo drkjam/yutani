@@ -7,6 +7,14 @@ class Vector {
         this.y = y
     }
 
+    draw(g, x, y, color='#00f') {
+        let s = new Segment(x, y, this.x + x, this.y + y)
+        let p = new Point(this.x + x, this.y + y)
+        s.draw(g, 2, color)
+        p.draw(g, 3, color)
+
+    }
+
     update(x, y) {
         //  Update the x and y coordinates of this vector.
         this.x = x

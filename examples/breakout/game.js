@@ -1,6 +1,8 @@
+'use strict'
+
 class Breakout extends Engine {
-    constructor(canvas, enableKeyboard=true, enableMouse=true) {
-        super(canvas, enableKeyboard, enableMouse)
+    constructor(canvas) {
+        super(canvas)
         this.debug = false
 
         this.boundary = new Rectangle(0, 0, this.width, this.height)
@@ -161,11 +163,7 @@ class Breakout extends Engine {
 
         if(this.debug) {
             //  Draw velocity vector for the ball.
-            let v = this.ball.vector
-            let s = new Segment(this.ball.x, this.ball.y, this.ball.x + v.x, this.ball.y + v.y)
-            let p = new Point(this.ball.x + v.x, this.ball.y + v.y)
-            s.draw(this.g, 2, '#00f')
-            p.draw(this.g, 3, '#00f')
+            this.ball.vector.draw(this.g)
         }
 
         if(this.state.current === 'GAME OVER') {
