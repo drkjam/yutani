@@ -1,7 +1,7 @@
 'use strict'
 
 class Engine {
-    constructor(canvas, enableMouse=true) {
+    constructor(canvas) {
         //  Set up graphics context.
         this.running = false
         this.canvas = canvas
