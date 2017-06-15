@@ -24,7 +24,7 @@ class Rectangle {
         ]
     }
 
-    draw(g, size=2, strokeStyle='#000', fillStyle=undefined) {
+    draw(g, size=2, strokeStyle='#000', fillStyle=null) {
         //  Draws this rectangle on canvas context (c).
         g.beginPath()
         g.rect(this.x, this.y, this.width, this.height)
@@ -35,7 +35,7 @@ class Rectangle {
         g.strokeStyle = strokeStyle
         g.stroke()
 
-        if (fillStyle !== undefined) {
+        if (fillStyle !== null) {
             //  Fill rectangle color.
             g.fillStyle = fillStyle
             g.fill()

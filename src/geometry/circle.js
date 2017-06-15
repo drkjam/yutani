@@ -13,7 +13,7 @@ class Circle {
         this.y = y
     }
 
-    draw(g, size=2, strokeStyle='#000', fillStyle=undefined) {
+    draw(g, size=2, strokeStyle='#000', fillStyle=null) {
         //  Draws this circle on canvas context (c).
         g.beginPath()
         g.arc(this.x, this.y, this.radius, 0, 2 * Math.PI)
@@ -24,7 +24,7 @@ class Circle {
         g.strokeStyle = strokeStyle
         g.stroke()
 
-        if (fillStyle !== undefined) {
+        if (fillStyle !== null) {
             //  Fill circle color.
             g.fillStyle = fillStyle
             g.fill()
