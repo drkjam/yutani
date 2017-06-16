@@ -78,27 +78,36 @@ class Brick extends Rectangle {
 
 class Bricks {
     constructor(rows=6, cols=9, width=60, height=30, padding=5, offsetTop=120, offsetLeft=30) {
+        this.rows = rows
+        this.cols = cols
+        this.remaining = this.rows * this.cols
+        this.bricks = []
+        this.width = width
+        this.height = height
+        this.padding = padding
+        this.offsetTop = offsetTop
+        this.offsetLeft = offsetLeft
+
         this.brickTypes = [
-            {color: '#808080', strength: 5},
+            {color: '#808080', strength: 2},
             {color: '#ff0000', strength: 1},
             {color: '#ffff00', strength: 1},
             {color: '#0000ff', strength: 1},
             {color: '#ff00ff', strength: 1},
             {color: '#00ff00', strength: 1},
         ]
+    }
 
-        this.rows = rows
-        this.cols = cols
-        this.remaining = this.rows * this.cols
+    reset() {
         this.bricks = []
 
         for (let i=0; i < this.cols; i++) {
             this.bricks[i] = []
             for (let j=0; j < this.rows; j++) {
                 let brickType = this.brickTypes[j]
-                let x = (i * (width + padding)) + offsetLeft
-                let y = (j * (height + padding)) + offsetTop
-                this.bricks[i][j] = new Brick(x, y, width, height, brickType.color, brickType.strength)
+                let x = (i * (this.width + this.padding)) + this.offsetLeft
+                let y = (j * (this.height + this.padding)) + this.offsetTop
+                this.bricks[i][j] = new Brick(x, y, this.width, this.height, brickType.color, brickType.strength)
             }
         }
     }

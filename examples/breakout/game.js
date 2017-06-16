@@ -12,6 +12,7 @@ class Breakout extends Engine {
         this.rightWall = new Wall(this.width - 20, 40, this.width - 20, this.height)
 
         this.bricks = new Bricks()
+        this.bricks.reset()
 
         let paddleHeight = 20
         let paddleWidth = 100
@@ -27,7 +28,7 @@ class Breakout extends Engine {
         let ballRadius = 15
         let ballX = this.width / 2
         let ballY = paddleY - ballRadius - 1
-        this.ballVelocity = new Vector(2, -2)
+        this.ballVelocity = new Vector(2, -3)
         this.ball = new Ball(ballX, ballY, ballRadius, this.ballVelocity)
 
         this.moveLeft = false
@@ -35,6 +36,7 @@ class Breakout extends Engine {
 
         this.lives = 3
         this.score = 0
+        this.highScore = 0
         this.message = ''
 
         this.state = new State({
@@ -69,6 +71,7 @@ class Breakout extends Engine {
 
     toggleDebugMode() {
         this.debug = !this.debug
+        console.log('debug:' + {true: 'on', false: 'off'}[this.debug])
         if(!this.running) {
             this.drawFrame()
         }
@@ -106,7 +109,11 @@ class Breakout extends Engine {
             if (e.keyCode === 0 || e.keyCode === 32) {
                 e.preventDefault()
                 if(!this.running) {
-                    this.resetGame()
+                    if(this.state.current === 'GAME OVER') {
+                        this.restartGame()
+                    } else {
+                        this.resetGame()
+                    }
                 }
             }
         }, false)
@@ -182,11 +189,21 @@ class Breakout extends Engine {
         this.start()
     }
 
+    restartGame() {
+        this.state.transition('READY')
+        this.ball.resetPosition()
+        this.lives = 3
+        this.score = 0
+        this.bricks.reset()
+        this.message = ''
+        this.start()
+    }
+
     drawScore(g){
         g.font = '28px Impact'
         g.fillStyle = 'rgba(0, 255, 255, 1.0'
         let leftPadding = 10
-        let text = "SCORE: " + this.score
+        let text = "SCORE: " + this.score + " HISCORE: " + this.highScore
         let height = 30
         g.fillText(text, leftPadding, height)
     }
@@ -230,7 +247,11 @@ class Breakout extends Engine {
 
     gameOver() {
         this.state.transition('GAME OVER')
+        console.log('state: game over')
         this.message = 'GAME OVER'
+        if(this.score > this.highScore) {
+            this.highScore = this.score
+        }
         this.drawFrame()
         this.stop()
     }
@@ -250,9 +271,7 @@ class Breakout extends Engine {
                 this.ball.switchY()
             }
 
-            if(this.paddle.hitBall(this.ball)) {
-                this.ball.switchY()
-            }
+            this.paddle.detectCollision(this.ball)
 
             if(this.bricks.detectCollision(this.ball)) {
                 this.score++
@@ -277,11 +296,13 @@ class Breakout extends Engine {
 
     start() {
         super.start()
+        console.log('running')
         this.state.transition('RUNNING')
     }
 
     stop() {
         super.stop()
+        console.log('paused')
         this.state.transition('PAUSED')
     }
 }
