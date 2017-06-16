@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vector Reflection</title>
+    <style>
+        * {
+            background: #000;
+            padding: 0; margin: 0
+        }
+        canvas {
+            background: #000;
+            display: block;
+            margin: 0 auto;
+            border: 3px #a0a0a0 solid
+        }
+    </style>
+    <script src="../../src/geometry/vector.js"></script>
+    <script src="../../src/geometry/point.js"></script>
+    <script src="../../src/geometry/segment.js"></script>
+    <script src="../../src/geometry/rectangle.js"></script>
+    <script src="../../src/geometry/circle.js"></script>
+    <script src="../../src/geometry/collision.js"></script>
+
+    <script src="../../src/io/mouse.js"></script>
+    <script src="../../src/engine.js"></script>
+
+    <script src="./reflection.js"></script>
+</head>
+<body>
+<canvas id="canvas" width="600" height="600"></canvas>
+<script type="text/javascript">
+    let game = new Reflection(
+        document.getElementById('canvas'),
+    )
+    game.registerEvents()
+    game.start()
+</script>
+</body>
+</html>
