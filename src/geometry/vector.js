@@ -46,6 +46,12 @@ class Vector {
         return this.x * v.x + this.y * v.y
     }
 
+    unit() {
+        //  Returns the unit vector for this vector.
+        let magnitude = this.magnitude()
+        return new Vector(this.x / magnitude, this.y / magnitude)
+    }
+
     projection(v) {
         //  Returns a scalar that represents the magnitude of this vector projected onto another.
         return this.scale(v.dot(this) / this.dot(this))
