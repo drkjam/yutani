@@ -21,6 +21,12 @@ class Vector {
         this.y = y
     }
 
+    updateVector(v) {
+        //  Update the x and y coordinates of this vector with the coordinates of another.
+        this.x = v.x
+        this.y = v.y
+    }
+
     add(v) {
         //  Returns a new vector representing the addition of this vector with another.
         return new Vector(this.x + v.x, this.y + v.y)
@@ -60,4 +66,16 @@ class Vector {
     toString() {
         return `Vector(x ${this.x} y: ${this.y})`
     }
+}
+
+function reflect(d, n, scalar=2) {
+    // Returns a vector (r) that is the reflection of an incoming vector (d) relative to some other vector (n)
+    //
+    //  r = d − 2(d ⋅ n)n
+    //
+    // The vector n is usually some vector pointing outward from some surface.
+    //
+    // varying scalar will change angle of the reflection (0 = no reflection, 2 = 90 degree reflection)
+    let u = n.unit()
+    return d.subtract(u.scale(scalar * d.dot(u)))
 }

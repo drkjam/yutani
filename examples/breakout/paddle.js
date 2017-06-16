@@ -9,6 +9,9 @@ class Paddle extends Rectangle {
         this.startY = y
         this.minWidth = minWidth
         this.maxWidth = maxWidth
+
+        //  This vector points upwards, out of the top surface of the paddle.
+        this.vector = new Vector(0, -1)
     }
 
     reset() {
@@ -38,8 +41,14 @@ class Paddle extends Rectangle {
         super.draw(g, 2, 'rgba(0, 255, 255, 1.0)', 'rgba(0, 255, 255, 0.5)')
     }
 
-    hitBall(ball) {
-        return circleTouchesRectangle(ball, this)
+    detectCollision(ball) {
+        if(circleTouchesRectangle(ball, this)) {
+            let bounceVector = reflect(ball.vector, this.vector)
+            ball.vector.updateVector(bounceVector)
+            return true
+        } else {
+            return false
+        }
     }
 
     toString() {
