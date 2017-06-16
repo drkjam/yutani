@@ -9,6 +9,12 @@ class Engine {
         this.height = canvas.height
         this.g = canvas.getContext('2d')
         this.frameId = null
+        this.frameCount = 0
+        this.framesPerSecond = 0
+        setInterval(()=> {
+            this.framesPerSecond = this.frameCount
+            this.frameCount = 0
+        }, 1000)
     }
 
     clearScreen() {
@@ -27,6 +33,7 @@ class Engine {
     draw() {
         this.updateState()
         this.drawFrame()
+        this.frameCount++
         if(this.running) {
             this.frameId = requestAnimationFrame(this.draw.bind(this))
         }
