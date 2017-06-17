@@ -98,7 +98,7 @@ class Bricks {
         ]
     }
 
-    reset() {
+    initialise() {
         this.bricks = []
 
         for (let i=0; i < this.cols; i++) {

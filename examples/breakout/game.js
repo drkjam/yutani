@@ -11,26 +11,6 @@ class Breakout extends Engine {
         this.topWall = new Wall(0, 40, this.width, 20)
         this.rightWall = new Wall(this.width - 20, 40, this.width - 20, this.height)
 
-        this.bricks = new Bricks()
-        this.bricks.reset()
-
-        let paddleHeight = 20
-        let paddleWidth = 100
-        let paddleX = (this.width - paddleWidth) / 2
-        let paddleY = (this.height - paddleHeight) - 4
-
-        this.paddle = new Paddle(
-            paddleX, paddleY,
-            paddleWidth, paddleHeight,
-            28, this.width - paddleWidth - 28
-        )
-
-        let ballRadius = 15
-        let ballX = this.width / 2
-        let ballY = paddleY - ballRadius - 1
-        this.ballVelocity = new Vector(2, -3)
-        this.ball = new Ball(ballX, ballY, ballRadius, this.ballVelocity)
-
         this.moveLeft = false
         this.moveRight = false
 
@@ -46,27 +26,10 @@ class Breakout extends Engine {
             'WIN': ['READY'],
             'GAME OVER': ['READY']
         }, 'READY')
-    }
 
-    speedUp() {
-        this.ball.vector = this.ball.vector.scale(1.1)
-        if(!this.running) {
-            this.drawFrame()
-        }
-    }
-
-    slowDown() {
-        this.ball.vector = this.ball.vector.scale(0.9)
-        if(!this.running) {
-            this.drawFrame()
-        }
-    }
-
-    reverseDirection() {
-        this.ball.vector = this.ball.vector.scale(-1.0)
-        if(!this.running) {
-            this.drawFrame()
-        }
+        this.bricks = new Bricks()
+        this.bricks.initialise()
+        this.resetGame()
     }
 
     toggleDebugMode() {
@@ -94,25 +57,65 @@ class Breakout extends Engine {
         this.drawFrame()
     }
 
+    speedUp() {
+        this.ball.speedUp()
+        if(!this.running) {
+            this.drawFrame()
+        }
+    }
+
+    slowDown() {
+        this.ball.slowDown()
+        if(!this.running) {
+            this.drawFrame()
+        }
+    }
+
+    movePaddle(e) {
+        this.paddle.moveX(e.movementX)
+    }
+
+    lockChange() {
+        if (document.pointerLockElement === canvas ||
+            document.mozPointerLockElement === canvas) {
+            console.log('pointer lock: locked')
+            this.canvas.addEventListener('mousemove', this.movePaddle.bind(this), false)
+        } else {
+            console.log('pointer lock: unlocked')
+            this.canvas.removeEventListener('mousemove', this.movePaddle.bind(this), false)
+        }
+    }
+
     registerEvents() {
-        this.canvas.style.cursor = 'none'
-        document.addEventListener('mousemove', (e) => {
+        // pointer lock event listener
+        // Hook pointer lock state change events for different browsers
+        document.addEventListener('pointerlockchange', this.lockChange.bind(this), false);
+        document.addEventListener('mozpointerlockchange', this.lockChange.bind(this), false);
+
+        this.canvas.onclick = () => {
+            this.canvas.requestPointerLock = (
+                this.canvas.requestPointerLock ||
+                this.canvas.mozRequestPointerLock
+            )
+            this.canvas.requestPointerLock()
+        }
+
+        document.addEventListener('wheel', (e) => {
+            console.log('preventing mouse wheel')
             e.preventDefault()
-            let relativeX = e.clientX - this.canvas.offsetLeft
-            if(relativeX > 95 && relativeX < 550){
-                this.paddle.x = relativeX - this.paddle.width / 2
-            }
-        }, false)
+        })
 
         window.addEventListener('keydown', (e) => {
             //  Space bar.
             if (e.keyCode === 0 || e.keyCode === 32) {
                 e.preventDefault()
-                if(!this.running) {
+                if(this.running) {
+                    this.togglePause()
+                } else {
                     if(this.state.current === 'GAME OVER') {
                         this.restartGame()
                     } else {
-                        this.resetGame()
+                        this.start()
                     }
                 }
             }
@@ -140,20 +143,27 @@ class Breakout extends Engine {
             else if(e.key === 'ArrowDown') {
                 this.slowDown()
             }
-            else if(e.key === 'r') {
-                this.reverseDirection()
+            else if(e.key === 'r' || e.key === 'R') {
+                this.restartGame()
             }
-            else if(e.key === 'x') {
-                this.gameOver()
+            else if(e.key === 'p' || e.key === 'P') {
+                this.togglePause()
             }
             else if(e.key === 'd') {
                 this.toggleDebugMode()
+                if(!this.running) {
+                    this.drawFrame()
+                }
             }
             else if(e.key === 's') {
                 this.step()
             }
             else if(e.key === 'Escape') {
-                this.togglePause()
+                document.exitPointerLock = (
+                    document.exitPointerLock ||
+                    document.mozExitPointerLock
+                )
+                document.exitPointerLock()
             }
         }, false)
     }
@@ -170,7 +180,7 @@ class Breakout extends Engine {
 
         if(this.debug) {
             //  Draw velocity vector for the ball.
-            this.ball.vector.draw(this.g)
+            this.ball.vector.scale(this.ball.radius).draw(this.g, this.ball.x, this.ball.y, '#f00')
         }
 
         if(this.state.current === 'GAME OVER') {
@@ -183,20 +193,37 @@ class Breakout extends Engine {
     }
 
     resetGame() {
-        this.state.transition('READY')
-        this.ball.resetPosition()
+        let paddleHeight = 20
+        let paddleWidth = 100
+        let paddleX = (this.width - paddleWidth) / 2
+        let paddleY = (this.height - paddleHeight) - 4
+
+        this.paddle = new Paddle(
+            paddleX, paddleY,
+            paddleWidth, paddleHeight,
+            25, this.width - 25
+        )
+
+        let ballRadius = paddleHeight / 2
+        this.ball = new Ball(
+            new Point(this.width / 2, this.paddle.y - ballRadius - 2),
+            new Vector(-3, -4),
+            ballRadius
+        )
+
         this.message = ''
-        this.start()
+        this.state.transition('READY')
+        // this.start()
     }
 
     restartGame() {
-        this.state.transition('READY')
-        this.ball.resetPosition()
+        this.bricks.initialise()
+        this.resetGame()
         this.lives = 3
         this.score = 0
-        this.bricks.reset()
+
         this.message = ''
-        this.start()
+        this.state.transition('READY')
     }
 
     drawScore(g){

@@ -1,23 +1,20 @@
 'use strict'
 
 class Ball extends Circle {
-    constructor(x, y, radius, vector) {
-        super(x, y, radius)
-        this.vector = vector
-        this.startX = x
-        this.startY = y
-        this.startDX = vector.x
-        this.startDY = vector.y
+    constructor(p, v, radius) {
+        super(p.x, p.y, radius)
+        this.vector = v
     }
 
     draw(g) {
-        super.draw(g, 2, 'rgba(0, 255, 255, 1.0)', 'rgba(0, 255, 255, 1.0)')
+        super.draw(g, 2, 'rgba(0, 255, 255, 1.0)', 'rgba(0, 255, 255, 0.25)')
     }
 
-    resetPosition() {
-        this.x = this.startX
-        this.y = this.startY
-        this.vector.update(this.startDX, this.startDY)
+    reset(p, v) {
+        this.x = p.x
+        this.y = p.y
+        this.vector.x = v.x
+        this.vector.y = v.y
     }
 
     switchX() {
@@ -39,5 +36,17 @@ class Ball extends Circle {
 
     toString() {
         return `ball x: ${this.x}, y: ${this.y})`
+    }
+
+    speedUp() {
+        this.vector = this.vector.scale(1.1)
+    }
+
+    slowDown() {
+        this.vector = this.vector.scale(0.9)
+    }
+
+    reverseDirection() {
+        this.vector = this.vector.scale(-1.0)
     }
 }

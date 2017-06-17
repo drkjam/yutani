@@ -9,13 +9,11 @@ class Paddle extends Rectangle {
         this.startY = y
         this.minWidth = minWidth
         this.maxWidth = maxWidth
-
-        //  This vector points upwards, out of the top surface of the paddle.
-        this.vector = new Vector(0, -1)
     }
 
     reset() {
         this.x = this.startX
+        this.y = this.startY
         this.y = this.startY
     }
 
@@ -32,8 +30,9 @@ class Paddle extends Rectangle {
     }
 
     moveX(x) {
-        if(this.x > this.minWidth && this.x + this.width < this.maxWidth) {
-            this.x = x
+        let newX = this.x + x
+        if(newX > this.minWidth && newX + this.width < this.maxWidth) {
+            this.x = newX
         }
     }
 
@@ -43,8 +42,15 @@ class Paddle extends Rectangle {
 
     detectCollision(ball) {
         if(circleTouchesRectangle(ball, this)) {
-            let bounceVector = reflect(ball.vector, this.vector)
-            ball.vector.updateVector(bounceVector)
+            //  Normalise the x coordinate of the ball between 0.0 (middle of paddle) and 1.0 (edge of paddle)
+            let minX = this.x + (this.width / 2)
+            let maxX = this.x + this.width
+            let scalar = (ball.x - minX) / (maxX - minX)
+
+            //  This vector points upwards from the top of the paddle.
+            let normalVector = new Vector(scalar, -5)
+            let bounceVector = reflect(ball.vector, normalVector)
+            ball.vector.replaceWith(bounceVector)
             return true
         } else {
             return false
