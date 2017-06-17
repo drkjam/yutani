@@ -21,8 +21,8 @@ class Vector {
         this.y = y
     }
 
-    updateVector(v) {
-        //  Update the x and y coordinates of this vector with the coordinates of another.
+    replaceWith(v) {
+        //  Update the x and y coordinates of this vector to match the coordinates of another.
         this.x = v.x
         this.y = v.y
     }
