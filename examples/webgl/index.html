@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My first WebGL shader</title>
+</head>
+<script id="vertexShader" type="x-shader/x-vertex">
+attribute vec3 pos;
+attribute vec4 clr;
+
+uniform mat4 trans;
+
+varying vec4 vcolor;
+
+void main() {
+    gl_Position = trans * vec4(pos, 1);
+    vcolor = clr;
+}
+</script>
+<script id="fragmentShader" type="x-shader/x-fragment">
+precision mediump float;
+
+varying vec4 vcolor;
+
+void main() {
+    gl_FragColor = vcolor;
+}
+</script>
+<script type="text/javascript">
+    window.onload = function() {
+        //  Initialise WebGL
+        const canvas = document.querySelector("#glCanvas");
+        const gl = canvas.getContext("webgl");
+
+        // Only continue if WebGL is available and working
+        if (gl === null) {
+            alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+            return;
+        }
+
+        //  Set the output resolution and viewport.
+        //  Helpful when user resizes the browser window.
+        const pixelRatio = window.devicePixelRatio || 1;
+        // canvas.width = pixelRatio * canvas.clientWidth;
+        // canvas.height = pixelRatio * canvas.clientHeight;
+        canvas.width = pixelRatio * (window.innerWidth / 2);
+        canvas.height = pixelRatio * (window.innerHeight / 2);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+
+        //  Initialize other WebGL states
+        gl.clearColor(0, 0, 0, 1); // black, fully opaque
+        gl.lineWidth(5.0);
+
+        //  Initialize vertex buffer objects
+        //	Set up scene data.
+        let positions = [
+            -0.4,  0.4, 0,
+            0.4,  0.4, 0,
+            0.0,  0.8, 0,
+
+            -0.4,  0.4, 0,
+             0.4,  0.4, 0,
+             0.4, -0.4, 0,
+
+            -0.4,  0.4, 0,
+             0.4, -0.4, 0,
+            -0.4, -0.4, 0,
+
+
+        ];
+
+        let colors = [
+            1, 0, 0, 1,
+            0, 1, 0, 1,
+            1, 1, 0, 1,
+
+            1, 0, 0, 1,
+            0, 1, 0, 1,
+            0, 0, 1, 1,
+
+            1, 0, 0, 1,
+            0, 0, 1, 1,
+            1, 0, 1, 1,
+        ];
+
+        //	Create memory handle on the GPU.
+        let position_buffer = gl.createBuffer();
+
+        // NB - API can only bind one buffer at a time ...
+        gl.bindBuffer(gl.ARRAY_BUFFER, position_buffer);
+
+        //	Allocate memory and push data into GPU memory.
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array(positions),
+            gl.STATIC_DRAW
+        );
+
+        //	Create memory handle on the GPU.
+        let color_buffer = gl.createBuffer();
+
+        // NB - API can only bind one buffer at a time ...
+        gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+
+        //	Allocate memory and push data into GPU memory.
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array(colors),
+            gl.STATIC_DRAW
+        );
+
+        //  Compile the vertex and fragment shaders into a WebGL program
+        //	Compiling a vertex shader.
+        const vs_src = document.querySelector('#vertexShader').text;
+        const vs = loadShader(gl, gl.VERTEX_SHADER, vs_src);
+
+        //	Compiling a fragment shader.
+        const fs_src = document.querySelector('#fragmentShader').text;
+        const fs = loadShader(gl, gl.FRAGMENT_SHADER, fs_src);
+
+        //	Link compiled shaders into program
+        const prog = buildShaderProgram(gl, vs, fs);
+
+        //  Update shader uniform variables
+        let m = gl.getUniformLocation(prog, 'trans');
+
+        let matrix = [
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1,
+        ];
+
+        //	Set which shader we are using.
+        gl.useProgram(prog);
+
+        //	set the value of the uniform parameter in the shader program.
+        gl.uniformMatrix4fv(m, false, matrix);
+
+        //  Set the vertex buffers used for rendering
+        // set the value for the position attribute in the vertex shader.
+        let p = gl.getAttribLocation(prog, 'pos');
+        gl.bindBuffer(gl.ARRAY_BUFFER, position_buffer);
+        gl.vertexAttribPointer(p, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(p);
+
+        // set the value for the color attribute in the vertex shader.
+        let c = gl.getAttribLocation(prog, 'clr');
+        gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+        gl.vertexAttribPointer(c, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(c);
+
+        //  Render the scene
+        gl.clear(gl.COLOR_BUFFER_BIT); // clear the screen, with clear colour
+        gl.useProgram(prog); // load the shader program
+
+        //  draw the scene
+        gl.drawArrays(gl.LINE_LOOP, 0, 9);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    function loadShader(gl, shader_type, shader_src) {
+        //	Compiling a vertex shader.
+        const shader = gl.createShader(shader_type);
+        gl.shaderSource(shader, shader_src);
+        gl.compileShader(shader);
+
+        //	Important to check that shader compiled successfully (will save hours of debugging).
+        if ( ! gl.getShaderParameter(shader, gl.COMPILE_STATUS) ) {
+            alert( gl.getShaderInfoLog(shader) );
+            gl.deleteShader(shader);
+            return null;
+        }
+
+        return shader
+    }
+
+    function buildShaderProgram(gl, vs, fs) {
+        const prog = gl.createProgram();
+        gl.attachShader(prog, vs);
+        gl.attachShader(prog, fs);
+        gl.linkProgram(prog);
+
+        if( ! gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+            alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(prog));
+            return null;
+        }
+
+        return prog;
+    }
+
+</script>
+<style>
+    body {
+        margin: 0;
+    }
+    #glCanvas {
+        display: block;
+    }
+</style>
+<body>
+    <canvas id="glCanvas"></canvas>
+</body>
+</html>
